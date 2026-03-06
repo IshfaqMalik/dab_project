@@ -29,8 +29,8 @@ jobs:
         run: |
           pytest\
            --disable-warnings\
-           --cov= .src\
-           --cov-report = htmil
+           --cov=src\
+           --cov-report =html
       - name: Upload Coverage HTM report 
         uses: actions/upload-artifact@v7
         with:
