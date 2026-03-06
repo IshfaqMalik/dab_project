@@ -30,12 +30,12 @@ jobs:
           pytest\
            --disable-warnings\
            --cov=src\
-           --cov-report =html
+           --cov-report=xml
       - name: Upload Coverage HTM report 
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v6
         with:
-          name: coverage-html
-          path: htmlcov
+          name: coverage-xml
+          path: coverage.xml
        
 
    
