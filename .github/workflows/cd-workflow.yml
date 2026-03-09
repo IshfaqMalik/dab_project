@@ -1,0 +1,71 @@
+name: CD WORKFLOW
+on:                          # 'run' should be 'on'
+  push:
+    branches:
+      - main
+
+jobs:
+  cd-deploy-test:            # remove the '- name' here, jobs don't use list syntax
+    name: Deploy To Test
+    runs-on: ubuntu-latest
+    environment: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+      - name: Install Databricks CLI
+        run: curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
+      - name: Install Dependencies
+        run: |
+          pip install --upgrade pip
+          pip install setuptools wheel
+      - name: Configure Databricks
+        run: |
+          cat <<EOF > ~/.databrickscfg
+          [TEST]
+          host = https://adb-7405607648433478.18.azuredatabricks.net
+          azure_client_id = ${{ secrets.AZURE_CLIENT_ID }}
+          azure_tenant_id = ${{ secrets.AZURE_TENENT_ID }}
+          azure_client_secret = ${{ secrets.AZURE_CLIENT_SECRET }}
+          EOF
+      - name: Deploy To TEST
+        run: |
+          databricks bundle deploy \
+            --target test \
+            --profile TEST
+
+  cd-deploy-prod:            # same level as cd-deploy-test, no dash
+    name: Deploy To Prod
+    needs: cd-deploy-test
+    runs-on: ubuntu-latest
+    environment: prod        # should be 'prod' not 'test'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+      - name: Install Databricks CLI
+        run: curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
+      - name: Install Dependencies
+        run: |
+          pip install --upgrade pip
+          pip install setuptools wheel
+      - name: Configure Databricks
+        run: |
+          cat <<EOF > ~/.databrickscfg
+          [PROD]
+          host = https://adb-7405609543179080.0.azuredatabricks.net
+          azure_client_id = ${{ secrets.AZURE_CLIENT_ID }}
+          azure_tenant_id = ${{ secrets.AZURE_TENENT_ID }}
+          azure_client_secret = ${{ secrets.AZURE_CLIENT_SECRET }}
+          EOF
+      - name: Deploy To PROD
+        run: |
+          databricks bundle deploy \
+            --target prod \
+            --profile PROD
