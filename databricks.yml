@@ -30,18 +30,18 @@ targets:
   test:
     mode: production
     variables:
-      catalog:
-        default: "citibikes_test"
-      dev_flag:
-        default: false
+      catalog: "citibikes_test"
+      dev_flag: false
     workspace:
       host: https://adb-7405607648433478.18.azuredatabricks.net
       # We explicitly deploy to /Workspace/Users/ishfaqmmalik@outlook.com to make sure we only have a single copy.
       root_path: /Workspace/Shared/.bundle/${bundle.name}/${bundle.target}
     
     permissions:
-      - user_name: ishfaqmmalik@outlook.com
+      - service_principal_name: 06dc8a1f-5666-4cdd-adb0-f08ed6f9ac1a
         level: CAN_MANAGE
+    run_as:
+      service_principal_name: 06dc8a1f-5666-4cdd-adb0-f08ed6f9ac1a
 
   prod:
     mode: production
@@ -56,5 +56,5 @@ targets:
       root_path: /Workspace/Shared/.bundle/${bundle.name}/${bundle.target}
    
     permissions:
-      - user_name: ishfaqmmalik@outlook.com
+      - service_principal_name: b27b88cd-6019-4269-8f9c-aa9733ef23dc
         level: CAN_MANAGE
